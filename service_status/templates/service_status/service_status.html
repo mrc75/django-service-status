@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .normal {
+            color: green;
+        }
+
+        .warning {
+            color: #CDCD00;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+    {% block extra-head %}
+    {% endblock extra-head %}
+</head>
+<body>
+
+
+{% block header %}
+{% endblock header %}
+
+
+{% block main %}
+    <div id="main">
+        <h1>{{ response_tag }}</h1>
+
+        <ul class="checks">
+            {% for check in status.checks %}
+                <li class="{{ check.status }}">{{ check }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock main %}
+
+
+{% block footer %}
+{% endblock footer %}
+
+</body>
+</html>
