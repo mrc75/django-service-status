@@ -5,7 +5,6 @@ import django_webtest
 import pytest
 import mock
 from django.core.urlresolvers import reverse
-from six import PY3
 
 from service_status.exceptions import SystemStatusWarning, SystemStatusError
 
@@ -42,7 +41,6 @@ def get_user_swap_mock(monkeypatch):
     return _mock
 
 
-@pytest.mark.xfail(PY3, reason='python3 api changes??? to be investigated...')
 @pytest.mark.django_db
 def test_base(app, time_mock, sentry_mock, get_user_swap_mock):
     url = reverse('service-status:service-status')
@@ -55,7 +53,6 @@ def test_base(app, time_mock, sentry_mock, get_user_swap_mock):
                                                 'SwapCheck: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)')
 
 
-@pytest.mark.xfail(PY3, reason='python3 api changes??? to be investigated...')
 @pytest.mark.django_db
 def test_warning1(app, time_mock, sentry_mock, get_user_swap_mock):
     url = reverse('service-status:service-status')
@@ -71,25 +68,24 @@ def test_warning1(app, time_mock, sentry_mock, get_user_swap_mock):
                                                     'SwapCheck: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)')
 
 
-@pytest.mark.xfail(PY3, reason='python3 api changes??? to be investigated...')
 @pytest.mark.django_db
 def test_warning2(app, time_mock, sentry_mock, get_user_swap_mock):
+    get_user_swap_mock.return_value = 4 * 1024
     url = reverse('service-status:service-status')
-    get_user_swap_mock.return_value = 1024
     with mock.patch('service_status.checks.DatabaseCheck._run',
                     side_effect=SystemStatusWarning('GOSH')) as _mock1:
         response = app.get(url)
         assert _mock1.call_count == 1
         assert time_mock.__get__.call_count == 2
         assert sentry_mock.warning.call_count == 2
-        assert repr(sentry_mock.warning.call_args_list) == "[call('GOSH'), call(u'the user swap memory is above 0 KB')]"
+        assert sentry_mock.warning.call_args_list == [mock.call('GOSH'),
+                                                      mock.call(u'the user swap memory is above 0 KB')]
         assert get_user_swap_mock.call_count == 1
         assert response.pyquery('#main').text() == ('WARNINGS_FOUND '
                                                     'DatabaseCheck: GOSH (7.000s) '
-                                                    'SwapCheck: the user swap memory is: 1 KB (limit: 0 KB) (7.000s)')
+                                                    'SwapCheck: the user swap memory is: 4 KB (limit: 0 KB) (7.000s)')
 
 
-@pytest.mark.xfail(PY3, reason='python3 api changes??? to be investigated...')
 @pytest.mark.django_db
 def test_error(app, time_mock, sentry_mock, get_user_swap_mock):
     url = reverse('service-status:service-status')
@@ -105,7 +101,6 @@ def test_error(app, time_mock, sentry_mock, get_user_swap_mock):
                                                     'SwapCheck: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)')
 
 
-@pytest.mark.xfail(PY3, reason='python3 api changes??? to be investigated...')
 @pytest.mark.django_db
 def test_exception(app, time_mock, sentry_mock, get_user_swap_mock):
     url = reverse('service-status:service-status')

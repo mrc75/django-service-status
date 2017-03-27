@@ -5,6 +5,7 @@ import logging
 from collections import namedtuple
 
 from django.apps import apps
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.module_loading import import_string
 
 from service_status.utils import get_user_swap, GetTime
@@ -14,6 +15,7 @@ from .exceptions import SystemStatusError, SystemStatusWarning
 sentry = logging.getLogger('sentry')
 
 
+@python_2_unicode_compatible
 class SystemCheckBase(object):
     code = None
     output = None
@@ -24,7 +26,7 @@ class SystemCheckBase(object):
     def __init__(self, **kwargs):
         pass
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {} ({:.3f}s)'.format(self.__class__.__name__, self.output, self.elapsed)
 
     def _run(self):
@@ -118,10 +120,11 @@ class SwapCheck(SystemCheckBase):
 
     def _run(self):
         swap = get_user_swap()
-        message = 'the user swap memory is: {} KB (limit: {} KB)'.format(swap / 1024, self.limit / 1024)
+        message = 'the user swap memory is: {swap:.0f} KB (limit: {limit:.0f} KB)'.format(swap=swap / 1024,
+                                                                                          limit=self.limit / 1024)
         if swap > self.limit:
             e = SystemStatusWarning(message)
-            e.log_message = 'the user swap memory is above {} KB'.format(self.limit / 1024)
+            e.log_message = 'the user swap memory is above {swap:.0f} KB'.format(swap=self.limit / 1024)
             raise e
         return message
 

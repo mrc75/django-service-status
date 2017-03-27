@@ -8,10 +8,13 @@ from django.views.generic.base import TemplateView
 from .checks import do_check
 
 
-@method_decorator(never_cache, name='dispatch')
 class ServiceStatusView(TemplateView):
     template_name = 'service_status/service_status.html'
     response_status_code = 200
+
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ServiceStatusView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         status = do_check()

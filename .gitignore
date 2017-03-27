@@ -16,6 +16,7 @@
 .vagrant
 /dist
 build
+htmlcov
 coverage.xml
 *.retry
 flake.out
