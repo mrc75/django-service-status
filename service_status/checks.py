@@ -30,11 +30,11 @@ class SystemCheckBase(object):
         return '{}: {} ({:.3f}s)'.format(self.__class__.__name__, self.output, self.elapsed)
 
     def _run(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     def run(self):
         try:
-            with GetTime(doprint=False) as self.timing:
+            with GetTime() as self.timing:
                 self.output = self._run() or 'OK'
         except SystemStatusWarning as e:
             self.warning = e
