@@ -7,10 +7,10 @@ from .utils import AppSettings
 class ApplicationSettings(AppSettings):
     defaults = {
         'CHECKS': (
-            'service_status.checks.DatabaseCheck',
-            'service_status.checks.SwapCheck',
+            ('DB_DEFAULT', 'service_status.checks.DatabaseCheck'),
+            ('SWAP', 'service_status.checks.SwapCheck'),
         ),
-        'INIT_DB': {
+        'INIT_DB_DEFAULT': {
             'model_name': 'sessions.Session',
         },
         'INIT_SWAP': {

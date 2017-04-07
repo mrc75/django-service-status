@@ -7,23 +7,27 @@ DEBUG = True
 USE_TZ = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+SECRET_KEY = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    },
+    'interface': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
 }
 
-ROOT_URLCONF = "tests.urls"
+ROOT_URLCONF = 'tests.urls'
 
 INSTALLED_APPS = [
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
-    "django.contrib.sites",
-    "service_status",
+    'django.contrib.sites',
+    'service_status',
 ]
 
 SITE_ID = 1
@@ -47,7 +51,6 @@ TEMPLATES = [
         # 'OPTIONS': {},
     },
 ]
-
 
 
 TEST_RUNNER = 'tests.runner.PytestTestRunner'

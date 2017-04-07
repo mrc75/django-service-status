@@ -17,17 +17,17 @@ sentry = logging.getLogger('sentry')
 
 @python_2_unicode_compatible
 class SystemCheckBase(object):
-    code = None
+    name = None
     output = None
     error = None
     warning = None
     timing = None
 
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, name, **kwargs):
+        self.name = name
 
     def __str__(self):
-        return '{}: {} ({:.3f}s)'.format(self.__class__.__name__, self.output, self.elapsed)
+        return '{} {}: {} ({:.3f}s)'.format(self.__class__.__name__, self.name, self.output, self.elapsed)
 
     def _run(self):
         raise NotImplementedError()  # pragma: no cover
@@ -70,17 +70,28 @@ class SystemCheckBase(object):
 
 
 class DatabaseCheck(SystemCheckBase):
-    code = 'DB'
     model_name = 'sessions.Session'
+    database_alias = None
 
     def __init__(self, **kwargs):
         super(DatabaseCheck, self).__init__(**kwargs)
         if 'model_name' in kwargs:
             self.model_name = kwargs['model_name']
-        self.model = apps.get_model(self.model_name)
+        if 'database_alias' in kwargs:
+            self.database_alias = kwargs['database_alias']
 
     def _run(self):
-        self.model.objects.count()
+        self.model = apps.get_model(self.model_name)
+
+        if self.database_alias:
+            queryset = self.model.objects.using(self.database_alias).all()
+        else:
+            queryset = self.model.objects.all()
+
+        count = queryset.count()
+
+        tpl = '{model} (db: {db}) {result} OK'
+        return tpl.format(model=self.model_name, db=queryset.db, result=count)
 
 
 # class SupervisorCheck(SystemCheckBase):
@@ -105,7 +116,6 @@ class DatabaseCheck(SystemCheckBase):
 
 
 class SwapCheck(SystemCheckBase):
-    code = 'SWAP'
     limit = 0
 
     def __init__(self, **kwargs):
@@ -134,10 +144,13 @@ def do_check():
     errors = []
     warnings = []
 
-    for check_name in conf.CHECKS:
+    for check_name, check_fqn in conf.CHECKS:
         try:
-            check_class = import_string(check_name)
-            check_init_kwargs = getattr(conf, 'INIT_{}'.format(check_class.code), {})
+            check_class = import_string(check_fqn)
+            check_init_kwargs = {'name': check_name}
+            check_setting_name = 'INIT_{}'.format(check_name)
+            if hasattr(conf, check_setting_name):
+                check_init_kwargs.update(getattr(conf, check_setting_name))
             check = check_class(**check_init_kwargs)
             checks.append(check)
             check.run()

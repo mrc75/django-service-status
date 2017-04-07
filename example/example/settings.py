@@ -76,6 +76,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'interface': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # we just need an additional db alias ;-)
     }
 }
 
@@ -114,3 +118,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# SERVICE_STATUS settings
+SERVICE_STATUS_CHECKS = (
+    ('DB_DEFAULT', 'service_status.checks.DatabaseCheck'),
+    ('DB_INTERFACE', 'service_status.checks.DatabaseCheck'),
+    ('SWAP', 'service_status.checks.SwapCheck'),
+)
+
+SERVICE_STATUS_INIT_DB_INTERFACE = {
+    'model_name': 'auth.group',
+    'database_alias': 'interface',
+}
+
+SERVICE_STATUS_INIT_SWAP = {
+    'limit': 32 * 1024 * 1024,
+}

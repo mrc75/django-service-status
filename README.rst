@@ -11,7 +11,7 @@ Django Service Status
 .. image:: https://travis-ci.org/mrc75/django-service-status.svg?branch=develop
     :target: https://travis-ci.org/mrc75/django-service-status
 
-.. image:: https://codecov.io/gh/mrc75/django-service-status/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/mrc75/django-service-status/branch/develop/graph/badge.svg
     :target: https://codecov.io/gh/mrc75/django-service-status
 
 Django pluggable app to monitor the service status
@@ -47,7 +47,7 @@ Add Django Service Status's URL patterns:
 
     urlpatterns = [
         ...
-        url(r'^', include(service_status_urls)),
+        url(r'^', include(service_status_urls, namespace='service-status')),
         ...
     ]
 
