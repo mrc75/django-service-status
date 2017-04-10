@@ -21,6 +21,6 @@ Add Django Service Status's URL patterns:
 
     urlpatterns = [
         ...
-        url(r'^', include(service_status_urls)),
+        url(r'^service_status/', include(service_status_urls, namespace='service-status')),
         ...
     ]
