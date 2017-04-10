@@ -19,6 +19,9 @@ Django pluggable app to monitor the service status
 Documentation
 -------------
 
+Django Service Status is a set of checks that are run every time your `http://example.com/service_status/`
+page is visited.
+
 The full documentation is at https://django-service-status.readthedocs.io.
 
 Quickstart
@@ -47,14 +50,17 @@ Add Django Service Status's URL patterns:
 
     urlpatterns = [
         ...
-        url(r'^', include(service_status_urls, namespace='service-status')),
+        url(r'^service_status/', include(service_status_urls, namespace='service-status')),
         ...
     ]
 
 Features
 --------
 
-* TODO
+Builtin checks are:
+
+* database
+* swap memory
 
 Running Tests
 -------------

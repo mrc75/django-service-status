@@ -2,8 +2,9 @@
 *.egg-info
 *.pyc
 *.pyo
-*.sqlite*
 *.rdb
+*.retry
+*.sqlite*
 *.~*
 *bower_components
 *credentials*json
@@ -15,11 +16,11 @@
 .tox
 .vagrant
 /dist
+_build
 build
-htmlcov
 coverage.xml
-*.retry
 flake.out
+htmlcov
 pep8.out
 pytest.xml
 ~*
