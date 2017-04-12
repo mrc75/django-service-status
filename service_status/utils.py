@@ -71,3 +71,19 @@ def get_user_swap():
             except (psutil.AccessDenied, psutil.NoSuchProcess, AttributeError):
                 pass
     return total
+
+
+class DummyCeleryApp(object):
+    def __init__(self):
+        class Control(object):
+            response = 'pong'
+
+            def ping(self, names):
+                if not self.response:
+                    return None
+                return [{name: {'ok': self.response}} for name in names]
+
+        self.control = Control()
+
+
+dummy_celery_app = DummyCeleryApp()

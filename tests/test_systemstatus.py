@@ -8,6 +8,7 @@ import mock
 from django.core.urlresolvers import reverse
 
 from service_status.exceptions import SystemStatusWarning, SystemStatusError
+from service_status.utils import dummy_celery_app
 
 
 @pytest.fixture
@@ -68,6 +69,23 @@ def settings_alias(settings):
     conf.__init__(conf.prefix)
 
 
+@pytest.yield_fixture()
+def settings_celery(settings):
+    from service_status.config import conf
+
+    settings.SERVICE_STATUS_CHECKS = (
+        ('CELERY', 'service_status.checks.CeleryCheck'),
+    )
+    settings.SERVICE_STATUS_INIT_CELERY = {
+        'celery_app_fqn': 'service_status.utils.dummy_celery_app',
+        'worker_names': ['foo', 'bar', 'baz'],
+    }
+    yield
+    delattr(settings, 'SERVICE_STATUS_CHECKS')
+    delattr(settings, 'SERVICE_STATUS_INIT_CELERY')
+    conf.__init__(conf.prefix)
+
+
 @pytest.mark.django_db
 def test_base(app, mock_time, mock_sentry, mock_get_user_swap):
     url = reverse('service-status:index')
@@ -93,6 +111,41 @@ def test_db_alias(settings_alias, app, mock_time, mock_sentry, mock_get_user_swa
                 'DatabaseCheck DB_DEFAULT: sessions.Session (db: default) 0 OK (7.000s) '
                 'DatabaseCheck DB_INTERFACE: auth.group (db: interface) 0 OK (7.000s) '
                 'SwapCheck SWAP: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)')
+    assert response.pyquery('#main').text() == expected
+
+
+@pytest.mark.django_db
+def test_celery(settings_celery, app, mock_time):
+    url = reverse('service-status:index')
+    response = app.get(url)
+
+    assert mock_time.call_count == 2
+    expected = ('SERVICE_OPERATIONAL '
+                'CeleryCheck CELERY: got response from 3 worker(s) (7.000s)')
+    assert response.pyquery('#main').text() == expected
+
+
+@pytest.mark.django_db
+def test_celery_notfound(settings_celery, app, mock_time):
+    dummy_celery_app.control.response = None
+    url = reverse('service-status:index')
+    response = app.get(url, status=503)
+
+    assert mock_time.call_count == 2
+    expected = ('ERRORS_FOUND '
+                'CeleryCheck CELERY: celery worker `foo` was not found (7.000s)')
+    assert response.pyquery('#main').text() == expected
+
+
+@pytest.mark.django_db
+def test_celery_failure(settings_celery, app, mock_time):
+    dummy_celery_app.control.response = 'sbong'
+    url = reverse('service-status:index')
+    response = app.get(url, status=503)
+
+    assert mock_time.call_count == 2
+    expected = ('ERRORS_FOUND '
+                'CeleryCheck CELERY: celery worker `foo` did not respond (7.000s)')
     assert response.pyquery('#main').text() == expected
 
 
