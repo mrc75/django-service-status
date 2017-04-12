@@ -61,6 +61,9 @@ Builtin checks are:
 
 * database
 * swap memory
+* celery workers
+
+Default settings: database, swap memory
 
 Running Tests
 -------------

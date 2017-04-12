@@ -139,6 +139,28 @@ class SwapCheck(SystemCheckBase):
         return message
 
 
+class CeleryCheck(SystemCheckBase):
+    def __init__(self, name, **kwargs):
+        super(CeleryCheck, self).__init__(name, **kwargs)
+        if 'celery_app_fqn' in kwargs:
+            self.celery_app_fqn = kwargs['celery_app_fqn']
+        if 'worker_names' in kwargs:
+            self.worker_names = kwargs['worker_names']
+
+    def _run(self):
+        celery_app = import_string(self.celery_app_fqn)
+        for name in self.worker_names:
+            response = celery_app.control.ping([name])
+
+            if not response:
+                raise SystemStatusError('celery worker `{}` was not found'.format(name))
+
+            if response[0][name] != {'ok': 'pong'}:
+                raise SystemStatusError('celery worker `{}` did not respond'.format(name))
+
+        return 'got response from {workers} worker(s)'.format(workers=len(self.worker_names))
+
+
 def do_check():
     checks = []
     errors = []
