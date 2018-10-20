@@ -90,7 +90,7 @@ def test_warning1(app, mock_dbcheck, mock_time, mock_sentry, mock_get_user_swap)
     assert mock_sentry.warning.call_count == 1
     assert mock_get_user_swap.call_count == 1
     expected = """\
-WARNINGS_FOUND
+SERVICE_OPERATIONAL
 DatabaseCheck DB_DEFAULT: GOSH (7.000s)
 SwapCheck SWAP: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)"""
     assert response.pyquery('#main').text() == expected
@@ -108,7 +108,7 @@ def test_warning2(app, mock_dbcheck, mock_time, mock_sentry, mock_get_user_swap)
                                                   mock.call(u'the user swap memory is above 0 KB')]
     assert mock_get_user_swap.call_count == 1
     expected = """\
-WARNINGS_FOUND
+SERVICE_OPERATIONAL
 DatabaseCheck DB_DEFAULT: GOSH (7.000s)
 SwapCheck SWAP: the user swap memory is: 4 KB (limit: 0 KB) (7.000s)"""
     assert response.pyquery('#main').text() == expected
