@@ -3,7 +3,7 @@
 History
 -------
 
-0.3.0 (dev)
+0.3.0 (2018-10-21)
 ++++++++++++++++++
 
 * Added support for Django 2.1
