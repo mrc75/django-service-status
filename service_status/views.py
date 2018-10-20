@@ -22,8 +22,8 @@ class ServiceStatusView(TemplateView):
         if status.errors:
             self.response_status_code = 503
             response_tag = 'ERRORS_FOUND'
-        elif status.warnings:
-            response_tag = 'WARNINGS_FOUND'
+        # elif status.warnings:
+        #     response_tag = 'WARNINGS_FOUND'
         else:
             response_tag = 'SERVICE_OPERATIONAL'
 

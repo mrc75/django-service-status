@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-import os
-
-import mock
 import pytest
 
 from service_status.config import conf
@@ -17,33 +14,6 @@ class Test_AppSettings():
         assert str(exception_info.value) == "'Settings' object has no attribute 'SERVICE_STATUS_FOO'"
         settings.SERVICE_STATUS_FOO = 'BAR'
         assert conf.FOO == 'BAR'
-
-
-@pytest.fixture
-def mock_psutil_process_iter(monkeypatch):
-    _mock = mock.Mock(return_value=[])
-    monkeypatch.setattr('psutil.process_iter', _mock)
-    return _mock
-
-
-@pytest.fixture
-def mock_process1(monkeypatch):
-    _mock = mock.Mock()
-    # process.uids()[0] == os.getuid():
-    _mock.uids.return_value = [os.getuid()]
-    # process.memory_full_info().swap
-    _mock.memory_full_info.return_value.swap = 10
-    return _mock
-
-
-@pytest.fixture
-def mock_process2(monkeypatch):
-    _mock = mock.Mock()
-    # process.uids()[0] == os.getuid():
-    _mock.uids.return_value = [os.getuid()]
-    # process.memory_full_info().swap
-    _mock.memory_full_info.side_effect = AttributeError('opss')
-    return _mock
 
 
 class Test_get_user_swap():
