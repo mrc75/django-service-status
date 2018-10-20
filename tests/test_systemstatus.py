@@ -3,7 +3,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import mock
 import pytest
-from django.urls import reverse
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from service_status.exceptions import SystemStatusError
 from service_status.utils import dummy_celery_app
