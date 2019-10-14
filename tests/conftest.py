@@ -86,6 +86,22 @@ def settings_celery(settings):
     conf.__init__(conf.prefix)
 
 
+@pytest.fixture()
+def settings_redis(settings):
+    from service_status.config import conf
+
+    settings.SERVICE_STATUS_CHECKS = (
+        ('REDIS', 'service_status.checks.RedisCheck'),
+    )
+    settings.SERVICE_STATUS_INIT_REDIS = {
+        'redis_url': 'redis://localhost:6379/13'
+    }
+    yield
+    delattr(settings, 'SERVICE_STATUS_CHECKS')
+    delattr(settings, 'SERVICE_STATUS_INIT_REDIS')
+    conf.__init__(conf.prefix)
+
+
 @pytest.fixture
 def mock_psutil_process_iter(monkeypatch):
     _mock = mock.Mock(return_value=[])
