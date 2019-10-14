@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
+import re
 from collections import namedtuple
 
 from django.apps import apps
@@ -11,6 +12,11 @@ from django.utils.module_loading import import_string
 from service_status.utils import get_user_swap, GetTime
 from .config import conf
 from .exceptions import SystemStatusError, SystemStatusWarning
+
+try:
+    import redis
+except ImportError:
+    pass
 
 sentry = logging.getLogger('sentry')
 
@@ -159,6 +165,34 @@ class CeleryCheck(SystemCheckBase):
                 raise SystemStatusError('celery worker `{}` did not respond'.format(name))
 
         return 'got response from {workers} worker(s)'.format(workers=len(self.worker_names))
+
+
+class RedisCheck(SystemCheckBase):
+    def __init__(self, **kwargs):
+        super(RedisCheck, self).__init__(**kwargs)
+        if 'redis_url' in kwargs:
+            self.redis_url = kwargs['redis_url']
+
+    def get_redis_url(self):
+        regex = r'redis:\/\/(?P<host>\w+):(?P<port>\d{4})\/(?P<db>\d+)'
+        m = re.match(regex, self.redis_url)
+        return m.groupdict()
+
+    def _run(self):
+        redis_url = self.get_redis_url()
+        try:
+            redis_con = redis.StrictRedis(
+                host=redis_url['host'],
+                port=redis_url['port'],
+                db=redis_url['db'],
+                socket_timeout=0.1,
+            )
+            redis_con.ping()
+        except NameError:
+            raise SystemStatusError('cannot import redis library')
+        except redis.connection.ConnectionError:
+            raise SystemStatusError('unable to connect')
+        return 'active'
 
 
 def do_check():
