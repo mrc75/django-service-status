@@ -147,7 +147,22 @@ SwapCheck SWAP: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)"""
 
 
 @pytest.mark.django_db
-def test_redis_not_connected(settings_redis, app, mock_time):
+def test_redis_no_redis(settings_redis, app, mock_time):
+    url = reverse('service-status:index')
+    response = app.get(url, status=503)
+
+    assert mock_time.call_count == 2
+    expected = """\
+ERRORS_FOUND
+RedisCheck REDIS: cannot import redis library (7.000s)"""
+    assert response.pyquery('#main').text() == expected
+
+
+@mock.patch('service_status.checks.redis', create=True)
+@pytest.mark.django_db
+def test_redis_not_connected(redis_mock, settings_redis, app, mock_time):
+    redis_mock.connection.ConnectionError = Exception
+    redis_mock.StrictRedis.side_effect = Exception()
     url = reverse('service-status:index')
     response = app.get(url, status=503)
 
@@ -158,14 +173,13 @@ RedisCheck REDIS: unable to connect (7.000s)"""
     assert response.pyquery('#main').text() == expected
 
 
-@mock.patch('service_status.checks.redis')
+@mock.patch('service_status.checks.redis', create=True)
 @pytest.mark.django_db
 def test_redis_status_active(redis_mock, settings_redis, app, mock_time):
     url = reverse('service-status:index')
     response = app.get(url, status=200)
     assert redis_mock.StrictRedis.call_count == 1
-    expected_args = {'socket_timeout': 0.1, 'host': u'localhost', 'db': u'13', 'port': u'6379'}
-    assert redis_mock.StrictRedis.call_args.kwargs == expected_args
+    redis_mock.StrictRedis.assert_called_with(host=u'localhost', port=u'6379', db=u'13', socket_timeout=0.1)
     assert mock_time.call_count == 2
     expected = """\
 SERVICE_OPERATIONAL
