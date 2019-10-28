@@ -3,6 +3,13 @@
 History
 -------
 
+0.4.0 (2019-10-28)
+++++++++++++++++++
+
+* Added support for Django 2.2
+* Added Redis Status check
+
+
 0.3.0 (2018-10-21)
 ++++++++++++++++++
 
