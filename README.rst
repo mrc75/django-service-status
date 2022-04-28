@@ -2,18 +2,6 @@
 Django Service Status
 =====================
 
-.. image:: https://badge.fury.io/py/django-service-status.svg
-    :target: https://badge.fury.io/py/django-service-status
-
-.. image:: https://travis-ci.org/mrc75/django-service-status.svg?branch=master
-    :target: https://travis-ci.org/mrc75/django-service-status
-
-.. image:: https://travis-ci.org/mrc75/django-service-status.svg?branch=develop
-    :target: https://travis-ci.org/mrc75/django-service-status
-
-.. image:: https://codecov.io/gh/mrc75/django-service-status/branch/develop/graph/badge.svg
-    :target: https://codecov.io/gh/mrc75/django-service-status
-
 Django pluggable app to monitor the service status
 
 Documentation
@@ -21,8 +9,6 @@ Documentation
 
 Django Service Status is a set of checks that are run every time your `http://example.com/service_status/`
 page is visited.
-
-The full documentation is at https://django-service-status.readthedocs.io.
 
 Quickstart
 ----------
