@@ -27,7 +27,7 @@ SwapCheck SWAP: the user swap memory is: 0 KB (limit: 0 KB) (7.000s)"""
     assert response.pyquery('#main').text() == expected
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(databases=['default', 'interface'])
 def test_db_alias(settings_alias, app, mock_time, mock_sentry, mock_get_user_swap):
     url = reverse('service-status:index')
     response = app.get(url)
