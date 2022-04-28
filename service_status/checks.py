@@ -6,7 +6,7 @@ import re
 from collections import namedtuple
 
 from django.apps import apps
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from django.utils.module_loading import import_string
 
 from service_status.utils import get_user_swap, GetTime
