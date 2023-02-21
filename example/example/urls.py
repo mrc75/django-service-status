@@ -1,5 +1,5 @@
-from django.conf.urls import url, include
+from django.urls import include, path
 
 urlpatterns = [
-    url(r'^', include('service_status.urls', namespace='service-status')),
+    path('', include('service_status.urls', namespace='service-status')),
 ]
