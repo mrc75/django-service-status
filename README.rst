@@ -51,6 +51,44 @@ Builtin checks are:
 
 Default settings: database, swap memory
 
+Add Your Own Checks:
+--------------------
+
+You can create a new check like this:
+
+utils/checks.py file:
+
+.. code-block:: python
+
+    from service_status.checks import SystemCheckBase
+    from service_status.exceptions import SystemStatusError
+
+
+    class CustomCheck(SystemCheckBase):
+    def __init__(self, **kwargs):
+        super(CustomCheck, self).__init__(**kwargs)
+        ## Your own initialization logic here
+         
+    def _run(self):
+
+        ## Your own logic for pass the check.
+
+        if True:
+            return 'OK'
+        else:
+            raise SystemStatusError("An error occured")
+
+Add the CustomCheck in your project setting:
+
+.. code-block:: python
+
+    SERVICE_STATUS_CHECKS  = [
+        ('DB_DEFAULT', 'service_status.checks.DatabaseCheck'),
+        ('SWAP', 'service_status.checks.SwapCheck'),
+        ('CustomCheck', 'utils.checks.CustomCheck')
+    ]
+    
+
 Running Tests
 -------------
 
